@@ -9,6 +9,9 @@ package proto;
 // Interface exported by the server.
 service LogIt {
 
+  // Log message, and swap log file
+  rpc SwapLogFile(LogData) returns (LogSuccess) {}
+
   // Repond to message - no loggin -just responde with success
   rpc IAmAlive(LogData) returns (LogSuccess) {}
 

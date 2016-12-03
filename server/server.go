@@ -1,4 +1,6 @@
 // Simple gRPC server that consolidates log files.
+// Based on google's sample gRPC
+// Copyright (C) Philip Schlump, 2015-2016.
 package main
 
 import (
@@ -7,6 +9,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -26,25 +29,39 @@ var (
 
 type logItServer struct {
 	fo *os.File
+	fn string
 }
 
-// LogMessage returns the feature at the given point. (PJS)
-func (s *logItServer) IAmAlive(ctx context.Context, in *pb.LogData) (*pb.LogSuccess, error) {
+// SwapLogFile will switch log files
+func (s *logItServer) SwapLogFile(ctx context.Context, in *pb.LogData) (*pb.LogSuccess, error) {
 
-	// fmt.Fprintf(s.fo, "%d: %s\n", in.Severity, in.Data) // xyzzy - add time stamp etc.
-	// xyzzy - add output destination file etc.
+	tm := time.Now().Format("2006-01-02T15-04-05.999999999")
+	fmt.Fprintf(s.fo, "%d: [LogSwap at %s] %s\n", in.Severity, tm, in.Data)
 
-	// No feature was found, return an unnamed feature
+	// -- close file, open new file
+	s.fo.Close()
+	os.Rename(s.fn, fmt.Sprintf("%s.%s", s.fn, tm))
+
+	fo, err := Fopen(s.fn, "a")
+	if err != nil {
+		fmt.Printf("Error: (fatal) unable to open %s for append, %s\n", s.fn, err)
+		os.Exit(1)
+	}
+	s.fo = fo
+
+	fmt.Fprintf(s.fo, "%d: [LogSwap at %s] %s\n", in.Severity, tm, in.Data)
+
 	return &pb.LogSuccess{Status: "success", Msg: ""}, nil
 }
 
-// LogMessage returns the feature at the given point. (PJS)
+// IAmAlive returns success if this service is alive
+func (s *logItServer) IAmAlive(ctx context.Context, in *pb.LogData) (*pb.LogSuccess, error) {
+	return &pb.LogSuccess{Status: "success", Msg: ""}, nil
+}
+
+// LogMessage save a message to file
 func (s *logItServer) LogMessage(ctx context.Context, in *pb.LogData) (*pb.LogSuccess, error) {
-
-	fmt.Fprintf(s.fo, "%d: %s\n", in.Severity, in.Data) // xyzzy - add time stamp etc.
-	// xyzzy - add output destination file etc.
-
-	// No feature was found, return an unnamed feature
+	fmt.Fprintf(s.fo, "%d: %s\n", in.Severity, in.Data) // TODO - add time stamp etc.
 	return &pb.LogSuccess{Status: "success", Msg: ""}, nil
 }
 
@@ -69,7 +86,8 @@ func Fopen(fn string, mode string) (file *os.File, err error) {
 
 func newServer(fn string) *logItServer {
 	s := new(logItServer)
-	// PJS - xyzzy - if no path, then create the log path
+	s.fn = fn
+
 	fo, err := Fopen(fn, "a")
 	if err != nil {
 		fmt.Printf("Error: (fatal) unable to open %s for append, %s\n", fn, err)

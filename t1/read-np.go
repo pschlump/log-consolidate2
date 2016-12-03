@@ -1,3 +1,4 @@
+// Copyright (C) Philip Schlump, 2015-2016.
 package main
 
 import (
@@ -27,7 +28,7 @@ func main() {
 
 	lim := 200
 
-	// infinite loop
+	// loop limited to 200
 	for {
 		line, _, err := reader.ReadLine()
 		if err != nil {

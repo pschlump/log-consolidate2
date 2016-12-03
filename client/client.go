@@ -1,4 +1,6 @@
 // Package main implements a simple logging client using gRPC.
+// Based on google's sample
+// Copyright (C) Philip Schlump, 2015-2016.
 package main
 
 import (
