@@ -11,8 +11,9 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	pb "google.golang.org/grpc/examples/chat/proto"
 	"google.golang.org/grpc/grpclog"
+
+	pb "github.com/pschlump/log-consolidate2/proto" // pb "google.golang.org/grpc/examples/chat/proto"
 )
 
 var (

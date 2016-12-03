@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/grpclog"
 
-	pb "google.golang.org/grpc/examples/chat/proto"
+	pb "github.com/pschlump/log-consolidate2/proto" // pb "google.golang.org/grpc/examples/chat/proto"
 )
 
 var (
@@ -26,6 +26,16 @@ var (
 
 type logItServer struct {
 	fo *os.File
+}
+
+// LogMessage returns the feature at the given point. (PJS)
+func (s *logItServer) IAmAlive(ctx context.Context, in *pb.LogData) (*pb.LogSuccess, error) {
+
+	// fmt.Fprintf(s.fo, "%d: %s\n", in.Severity, in.Data) // xyzzy - add time stamp etc.
+	// xyzzy - add output destination file etc.
+
+	// No feature was found, return an unnamed feature
+	return &pb.LogSuccess{Status: "success", Msg: ""}, nil
 }
 
 // LogMessage returns the feature at the given point. (PJS)
