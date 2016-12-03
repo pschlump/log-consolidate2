@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.logit";
+option java_outer_classname = "LogItProto";
+
+package proto;
+
+// Interface exported by the server.
+service LogIt {
+
+  // just log some data
+  rpc LogMessage(LogData) returns (LogSuccess) {}
+}
+
+message LogData {
+  int32 severity = 1;
+  string data = 2;
+}
+
+message LogSuccess {
+  string status = 1;
+  string msg = 2;
+}
+
